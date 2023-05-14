@@ -19,8 +19,9 @@
     "esModuleInterop": true,
     "removeComments": false,
     "jsx": "preserve",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom"], // 用于指定要包含在编译中的库文件
     "types": ["node"],
+    // 与别名配置对应
     "paths": {
       "compiler/*": ["src/compiler/*"],
       "core/*": ["src/core/*"],

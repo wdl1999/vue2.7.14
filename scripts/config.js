@@ -1,10 +1,13 @@
 const path = require('path')
 const alias = require('@rollup/plugin-alias') // 替换模块路径中的别名
+// Rollup的打包核心思想：主要是将代码编译成符合ES模块规范的代码包，
+// 当然也可以用其相关的插件实现CommonJS规范
 const cjs = require('@rollup/plugin-commonjs') // 支持CommonJS模块
 const replace = require('@rollup/plugin-replace') // 替换代码中的变量为指定值
 const node = require('@rollup/plugin-node-resolve').nodeResolve
-const ts = require('rollup-plugin-typescript2')
+const ts = require('rollup-plugin-typescript2') // 支持ts开发
 
+// 获取package.json中定义的版本号
 const version = process.env.VERSION || require('../package.json').version
 const featureFlags = require('./feature-flags')
 
@@ -15,12 +18,17 @@ const banner =
   ' * Released under the MIT License.\n' +
   ' */'
 
+// 此模块定义了所有别名及其对应的绝对路径
 const aliases = require('./alias')
 const resolve = p => {
+  // 获取路径的别名
   const base = p.split('/')[0]
+  // 判断别名是否存在
   if (aliases[base]) {
+    // 别名存在，将别名对应的绝对路径与文件名合并
     return path.resolve(aliases[base], p.slice(base.length + 1))
   } else {
+    // 别名不存在，将项目根路径
     return path.resolve(__dirname, '../', p)
   }
 }
@@ -227,14 +235,17 @@ const builds = {
 
 function genConfig(name) {
   const opts = builds[name]
+  // 除了不需要编译可以直接在浏览器环境中导入的
+  // 和输出格式为cjs的（运行在node环境，node8均支持es2017）
+  // 其余都是需要经ts转译成es5
   const isTargetingBrowser = !(
     opts.transpile === false || opts.format === 'cjs'
   )
 
-  // console.log('__dir', __dirname)
   const config = {
     input: opts.entry,
-    external: opts.external,
+    external: opts.external, // 额外的库
+    // 所有版本源代码都支持别名配置且支持ts开发
     plugins: [
       alias({
         entries: Object.assign({}, aliases, opts.alias)
@@ -244,8 +255,8 @@ function genConfig(name) {
         cacheRoot: path.resolve(__dirname, '../', 'node_modules/.rts2_cache'),
         tsconfigOverride: {
           compilerOptions: {
-            // if targeting browser, target es5
-            // if targeting node, es2017 means Node 8
+            // 如果是在浏览器端使用，统一转译成es5
+            // 如果是在node环境中使用，统一转译成es2017（node8均支持es2017）
             target: isTargetingBrowser ? 'es5' : 'es2017'
           },
           include: isTargetingBrowser ? ['src'] : ['src', 'packages/*/src'],

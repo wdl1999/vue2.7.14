@@ -4,6 +4,7 @@ const zlib = require('zlib') // nodejs内置模块 使用gzip算法进行文件�
 const rollup = require('rollup')
 const terser = require('terser') // 用于js代码压缩及美化
 
+// 同步方式判断dist是否存在，不存在则创建
 if (!fs.existsSync('dist')) {
   fs.mkdirSync('dist')
 }
