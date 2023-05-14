@@ -1,7 +1,7 @@
 const path = require('path')
-const alias = require('@rollup/plugin-alias')
-const cjs = require('@rollup/plugin-commonjs')
-const replace = require('@rollup/plugin-replace')
+const alias = require('@rollup/plugin-alias') // 替换模块路径中的别名
+const cjs = require('@rollup/plugin-commonjs') // 支持CommonJS模块
+const replace = require('@rollup/plugin-replace') // 替换代码中的变量为指定值
 const node = require('@rollup/plugin-node-resolve').nodeResolve
 const ts = require('rollup-plugin-typescript2')
 
