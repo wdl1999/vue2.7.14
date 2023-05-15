@@ -11,7 +11,16 @@ if (!fs.existsSync('dist')) {
 
 let builds = require('./config').getAllBuilds()
 
-// filter builds via command line arg
+/* process.argv包含了启动Node.js进程时的命令行参数 执行build:ssr打印:
+[
+  'D:\\software\\nodejs\\node.exe',
+  'D:\\code\\vueSource\\vue2.7.14\\scripts\\build.js',
+  'runtime-cjs,server-renderer'
+]
+process.argv[0]返回node.exe绝对路径
+process.argv[1]返回为当前执行的js文件路径
+剩余的元素为其他命令行参数 */
+// 通过命令行参数对构建配置做过滤
 if (process.argv[2]) {
   const filters = process.argv[2].split(',')
   builds = builds.filter(b => {
@@ -40,14 +49,19 @@ function build(builds) {
   next()
 }
 
+// 真正开始通过rollup对其进行编译 ，等同于使用命令行编译rollup -c xxx
 function buildEntry(config) {
   const output = config.output
   const { file, banner } = output
   const isProd = /(min|prod)\.js$/.test(file)
+  // rollup.rollup(config) 传入配置详情 创建一个bundle
+  // bundle.generate(output)  在内存中生成输出特定的代码
+  console.log('1111 config', config)
   return rollup
     .rollup(config)
     .then(bundle => bundle.generate(output))
     .then(async ({ output: [{ code }] }) => {
+      // 生产环境的包需要压缩和美化代码
       if (isProd) {
         const { code: minifiedCode } = await terser.minify(code, {
           toplevel: true,
@@ -81,9 +95,11 @@ function write(dest, code, zip) {
     if (!fs.existsSync(path.dirname(dest))) {
       fs.mkdirSync(path.dirname(dest), { recursive: true })
     }
+    // 写文件操作
     fs.writeFile(dest, code, err => {
       if (err) return reject(err)
       if (zip) {
+        // 文件压缩
         zlib.gzip(code, (err, zipped) => {
           if (err) return reject(err)
           report(' (gzipped: ' + getSize(zipped) + ')')

@@ -257,6 +257,7 @@ function genConfig(name) {
           compilerOptions: {
             // 如果是在浏览器端使用，统一转译成es5
             // 如果是在node环境中使用，统一转译成es2017（node8均支持es2017）
+            // 直接在浏览器端导入的为什么也转成es2017
             target: isTargetingBrowser ? 'es5' : 'es2017'
           },
           include: isTargetingBrowser ? ['src'] : ['src', 'packages/*/src'],
@@ -268,18 +269,17 @@ function genConfig(name) {
       file: opts.dest,
       format: opts.format,
       banner: opts.banner,
-      name: opts.moduleName || 'Vue',
+      name: opts.moduleName || 'Vue', // bundle名
       exports: 'auto'
     },
+    // 拦截警告信息的函数。如果不提供，警告将去重并打印到控制台。
     onwarn: (msg, warn) => {
       if (!/Circular/.test(msg)) {
         warn(msg)
       }
     }
   }
-
-  // console.log('pluging', config.plugins)
-
+  // 定义代码中用到的变量为特定值
   // built-in vars
   const vars = {
     __VERSION__: version,
@@ -300,6 +300,7 @@ function genConfig(name) {
   vars.preventAssignment = true
   config.plugins.push(replace(vars))
 
+  // 每一组配置对象都用传进来的TARGET命名
   Object.defineProperty(config, '_name', {
     enumerable: false,
     value: name
