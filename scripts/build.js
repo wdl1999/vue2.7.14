@@ -56,7 +56,8 @@ function buildEntry(config) {
   const isProd = /(min|prod)\.js$/.test(file)
   // rollup.rollup(config) 传入配置详情 创建一个bundle
   // bundle.generate(output)  在内存中生成输出特定的代码
-  console.log('1111 config', config)
+  // { output: [{ code }] }是个解构而非类型
+  // 解释：执行结果是是包含output的对象，output是一个数组，数组元素为包含code属性的对象
   return rollup
     .rollup(config)
     .then(bundle => bundle.generate(output))
@@ -91,11 +92,14 @@ function write(dest, code, zip) {
       )
       resolve()
     }
-
+    // path.dirname(）返回文件目录名
+    // fs.mkdirSync() 创建文件目录
+    // recursive：true 由此创建的文件目录，不管该文件目录胡总和dest文件是否存在都不会报错
     if (!fs.existsSync(path.dirname(dest))) {
-      fs.mkdirSync(path.dirname(dest), { recursive: true })
+      fs.mkdirSync(path.dirname(dest), { recursive })
     }
-    // 写文件操作
+    // 写文件操作 不存在dest文件则创建并写入，存在则覆盖
+    // 实际没有压缩，只是计算并打印出了压缩后体积 压缩后的包为.zip而非.js
     fs.writeFile(dest, code, err => {
       if (err) return reject(err)
       if (zip) {
