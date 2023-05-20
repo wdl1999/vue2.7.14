@@ -1,9 +1,11 @@
+// 此文件是vue真正初始化的地方，之后都是引入此模块后对vue进行相应的拓展
 import Vue from './instance/index'
 import { initGlobalAPI } from './global-api/index'
 import { isServerRendering } from 'core/util/env'
 import { FunctionalRenderContext } from 'core/vdom/create-functional-component'
 import { version } from 'v3'
 
+// 定义vue的全局方法
 initGlobalAPI(Vue)
 
 Object.defineProperty(Vue.prototype, '$isServer', {
