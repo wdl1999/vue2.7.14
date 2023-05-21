@@ -14,7 +14,9 @@ import { EffectScope } from 'v3/reactivity/effectScope'
 let uid = 0
 
 export function initMixin(Vue: typeof Component) {
+  // options即传入new Vue的参数
   Vue.prototype._init = function (options?: Record<string, any>) {
+    // vm即new Vue出来的实例
     const vm: Component = this
     // a uid
     vm._uid = uid++
@@ -42,6 +44,7 @@ export function initMixin(Vue: typeof Component) {
       // internal component options needs special treatment.
       initInternalComponent(vm, options as any)
     } else {
+      // 传入的options会被定义到vm.$options上
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor as any),
         options || {},
@@ -71,7 +74,7 @@ export function initMixin(Vue: typeof Component) {
       mark(endTag)
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
-
+    // 在全版本中，new Vue时会传入el，在这里会挂载到对应的dom对象上
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

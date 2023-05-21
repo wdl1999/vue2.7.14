@@ -17,7 +17,7 @@ function Vue(options) {
   this._init(options)
 }
 
-// 定义vue原型方法
+// 在vue原型上定义了很多方法
 //@ts-expect-error Vue has function type
 initMixin(Vue)
 //@ts-expect-error Vue has function type

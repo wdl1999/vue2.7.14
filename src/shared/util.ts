@@ -33,6 +33,10 @@ export function isPrimitive(value: any): boolean {
   )
 }
 
+// 由于函数嵌套，ts不能进行正确的类型判断
+// value is (...args: any[]) => any
+// 不仅返回是boolean类型
+// 还明确value是函数
 export function isFunction(value: any): value is (...args: any[]) => any {
   return typeof value === 'function'
 }
@@ -59,6 +63,7 @@ export function toRawType(value: any): string {
  * Strict object type check. Only returns true
  * for plain JavaScript objects.
  */
+// 调用原始的toString()坐类型判断，弥补typeof会将null、array判断为object的缺点
 export function isPlainObject(obj: any): boolean {
   return _toString.call(obj) === '[object Object]'
 }

@@ -40,6 +40,7 @@ const sharedPropertyDefinition = {
 }
 
 export function proxy(target: Object, sourceKey: string, key: string) {
+  // sourceKey为私有变量，定义get、set方法以便存取，例如this._data.XXX
   sharedPropertyDefinition.get = function proxyGetter() {
     return this[sourceKey][key]
   }
@@ -122,6 +123,7 @@ function initProps(vm: Component, propsOptions: Object) {
 function initData(vm: Component) {
   let data: any = vm.$options.data
   data = vm._data = isFunction(data) ? getData(data, vm) : data || {}
+  // 如果data返回的不是一个对象会报警告
   if (!isPlainObject(data)) {
     data = {}
     __DEV__ &&
@@ -138,6 +140,8 @@ function initData(vm: Component) {
   let i = keys.length
   while (i--) {
     const key = keys[i]
+    // 遍历data的key值 不能与methods、props的key同名
+    // 因为最后都会挂载到vm上
     if (__DEV__) {
       if (methods && hasOwn(methods, key)) {
         warn(`Method "${key}" has already been defined as a data property.`, vm)
@@ -151,6 +155,8 @@ function initData(vm: Component) {
           vm
         )
     } else if (!isReserved(key)) {
+      // 将key挂载在vm._data上
+      // 所以访问this.xxx其实是在访问this._data.xxx
       proxy(vm, `_data`, key)
     }
   }
@@ -159,6 +165,7 @@ function initData(vm: Component) {
   ob && ob.vmCount++
 }
 
+// 执行data函数，并响应式处理
 export function getData(data: Function, vm: Component): any {
   // #7573 disable dep collection when invoking data getters
   pushTarget()
