@@ -74,7 +74,7 @@ export function initMixin(Vue: typeof Component) {
       mark(endTag)
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
-    // 在全版本中，new Vue时会传入el，在这里会挂载到对应的dom对象上
+    // 在全版本中，new Vue时会传入el，在这里会将模板渲染成真实的dom
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

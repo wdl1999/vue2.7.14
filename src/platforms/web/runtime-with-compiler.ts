@@ -17,15 +17,15 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
-// 挂载$mount方法，跟编译器编译相关的方法
+// 将原mount方法存起来，重新定义$mount方法
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
 ): Component {
-  el = el && query(el)
+  el = el && query(el) // dom元素
 
-  /* istanbul ignore if */
+  // el不可以是body或html标签，因为el元素会被覆盖
   if (el === document.body || el === document.documentElement) {
     __DEV__ &&
       warn(
@@ -36,6 +36,8 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
+  // 先判断是否传入了render方法，传入直接执行mount方法
+  // 如果没有传入则将模板编译转换成render函数
   if (!options.render) {
     let template = options.template
     if (template) {
@@ -51,6 +53,9 @@ Vue.prototype.$mount = function (
           }
         }
       } else if (template.nodeType) {
+        // template.nodeType返回元素节点类型
+        // 表示template传入的是一个dom元素
+        // template.innerHTML + 对象本身 = template.outerHTML
         template = template.innerHTML
       } else {
         if (__DEV__) {
@@ -60,8 +65,10 @@ Vue.prototype.$mount = function (
       }
     } else if (el) {
       // @ts-expect-error
-      template = getOuterHTML(el)
+      // 如果没有传进template参数，就用el参数对应的dom元素序列化后作为模板
+      template = getOuterHTML(el) // 获取该dom元素序列化后的字符串
     }
+    // 以下跟编译相关
     if (template) {
       /* istanbul ignore if */
       if (__DEV__ && config.performance && mark) {
@@ -98,9 +105,13 @@ Vue.prototype.$mount = function (
  */
 function getOuterHTML(el: Element): string {
   if (el.outerHTML) {
+    // 返回元素及其子元素序列化后字符串
     return el.outerHTML
   } else {
+    // 注意：不能用outerHTML访问svg元素 因为它不属于html
+    // 此时可以创建一个div元素包住并返回
     const container = document.createElement('div')
+    // el.cloneNode拷贝元素并返回副本，传入true表示克隆后代
     container.appendChild(el.cloneNode(true))
     return container.innerHTML
   }
