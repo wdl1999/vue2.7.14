@@ -18,6 +18,8 @@ const idToTemplate = cached(id => {
 })
 
 // 将原mount方法存起来，重新定义$mount方法
+// 新$mount方法就是为了根据el、template选项生成render函数
+// runtime-only版本会传入render函数，所以不需要这一段
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (
   el?: string | Element,
@@ -36,8 +38,6 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
-  // 先判断是否传入了render方法，传入直接执行mount方法
-  // 如果没有传入则将模板编译转换成render函数
   if (!options.render) {
     let template = options.template
     if (template) {

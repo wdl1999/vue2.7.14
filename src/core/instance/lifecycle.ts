@@ -149,6 +149,7 @@ export function mountComponent(
   hydrating?: boolean
 ): Component {
   vm.$el = el
+  // 如果没有正确生成render函数，vue会报警告
   if (!vm.$options.render) {
     // @ts-expect-error invalid type
     vm.$options.render = createEmptyVNode
@@ -177,13 +178,14 @@ export function mountComponent(
 
   let updateComponent
   /* istanbul ignore if */
+
   if (__DEV__ && config.performance && mark) {
     updateComponent = () => {
       const name = vm._name
       const id = vm._uid
       const startTag = `vue-perf-start:${id}`
       const endTag = `vue-perf-end:${id}`
-
+      // 性能埋点
       mark(startTag)
       const vnode = vm._render()
       mark(endTag)
@@ -216,6 +218,7 @@ export function mountComponent(
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined
+  // 创建一个渲染watcher
   new Watcher(
     vm,
     updateComponent,
