@@ -24,6 +24,7 @@ const ALWAYS_NORMALIZE = 2
 
 // wrapper function for providing a more flexible interface
 // without getting yelled at by flow
+// 将_createElement包装一层 使createElement更灵活
 export function createElement(
   context: Component,
   tag: any,
@@ -32,6 +33,7 @@ export function createElement(
   normalizationType: any,
   alwaysNormalize: boolean
 ): VNode | Array<VNode> {
+  // 对参数个数不一致的处理
   if (isArray(data) || isPrimitive(data)) {
     normalizationType = children
     children = data
@@ -50,6 +52,7 @@ export function _createElement(
   children?: any,
   normalizationType?: number
 ): VNode | Array<VNode> {
+  // data不能是响应式的 __ob__代表此数据是响应式的
   if (isDef(data) && isDef((data as any).__ob__)) {
     __DEV__ &&
       warn(
@@ -58,7 +61,7 @@ export function _createElement(
         )}\n` + 'Always create fresh vnode data objects in each render!',
         context
       )
-    return createEmptyVNode()
+    return createEmptyVNode() // 创建一个注释节点
   }
   // object syntax in v-bind
   if (isDef(data) && isDef(data.is)) {

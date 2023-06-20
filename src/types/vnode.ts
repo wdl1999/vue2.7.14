@@ -71,7 +71,7 @@ export type VNodeWithData = VNode & {
  * @internal
  */
 export interface VNodeData {
-  key?: string | number
+  key?: string | number 
   slot?: string
   ref?: string | Ref | ((el: any) => void)
   is?: string

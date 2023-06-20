@@ -73,6 +73,7 @@ const builds = {
     banner
   },
   // Runtime only ES modules build (for bundlers)
+  // 使用的版本
   'runtime-esm': {
     entry: resolve('web/entry-runtime-esm.ts'),
     dest: resolve('dist/vue.runtime.esm.js'),
@@ -292,6 +293,7 @@ function genConfig(name) {
     vars[`process.env.${key}`] = featureFlags[key]
   })
   // build-specific env
+  // 特别指定环境变量
   if (opts.env) {
     vars['process.env.NODE_ENV'] = JSON.stringify(opts.env)
     vars.__DEV__ = opts.env !== 'production'

@@ -127,6 +127,7 @@ export function renderMixin(Vue: typeof Component) {
       // when parent component is patched.
       setCurrentInstance(vm)
       currentRenderingInstance = vm
+      // 执行传进来的render函数会得到一个vnode
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e: any) {
       handleError(e, vm, `render`)

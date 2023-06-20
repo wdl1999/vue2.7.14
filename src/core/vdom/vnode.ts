@@ -1,3 +1,4 @@
+// 此文件是一些创建不同VNode的的类/方法
 import type { Component } from 'types/component'
 import type { ComponentOptions } from 'types/options'
 import type { VNodeComponentOptions, VNodeData } from 'types/vnode'
@@ -5,6 +6,7 @@ import type { VNodeComponentOptions, VNodeData } from 'types/vnode'
 /**
  * @internal
  */
+// VNode只是用来映射真实dom的渲染，不需要包含操作dom的方法，因此是比较轻量的
 export default class VNode {
   tag?: string
   data: VNodeData | undefined
@@ -55,14 +57,14 @@ export default class VNode {
     this.fnContext = undefined
     this.fnOptions = undefined
     this.fnScopeId = undefined
-    this.key = data && data.key
+    this.key = data && data.key // 记录嵌套情况
     this.componentOptions = componentOptions
     this.componentInstance = undefined
     this.parent = undefined
     this.raw = false
     this.isStatic = false
     this.isRootInsert = true
-    this.isComment = false
+    this.isComment = false // 是否为注释节点
     this.isCloned = false
     this.isOnce = false
     this.asyncFactory = asyncFactory
@@ -77,6 +79,7 @@ export default class VNode {
   }
 }
 
+// 创建一个注释节点
 export const createEmptyVNode = (text: string = '') => {
   const node = new VNode()
   node.text = text
@@ -84,6 +87,7 @@ export const createEmptyVNode = (text: string = '') => {
   return node
 }
 
+// 创建一个文本节点
 export function createTextVNode(val: string | number) {
   return new VNode(undefined, undefined, undefined, String(val))
 }
