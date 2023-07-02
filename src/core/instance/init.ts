@@ -74,7 +74,8 @@ export function initMixin(Vue: typeof Component) {
       mark(endTag)
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
-    // 在全版本中，new Vue时会传入el，在这里会将模板渲染成真实的dom
+    // new Vue会传入el，在这里会将模板渲染成真实的dom
+    // 如果没有传入el，需要自行调$mount进行挂载
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

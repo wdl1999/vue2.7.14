@@ -59,6 +59,7 @@ export function initLifecycle(vm: Component) {
 }
 
 export function lifecycleMixin(Vue: typeof Component) {
+  // 调用场景：1、初始化时调用 2、数据更新时调用
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
@@ -149,7 +150,7 @@ export function mountComponent(
   hydrating?: boolean
 ): Component {
   vm.$el = el
-  // 如果没有正确生成render函数，vue会报警告
+  // 如果没有render函数，vue会报警告(render函数可以是传入的，也可以是编译生成的)
   if (!vm.$options.render) {
     // @ts-expect-error invalid type
     vm.$options.render = createEmptyVNode

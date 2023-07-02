@@ -22,6 +22,7 @@ export function initRender(vm: Component) {
   vm._vnode = null // the root of the child tree
   vm._staticTrees = null // v-once cached trees
   const options = vm.$options
+  // ！为ts非空断言操作符，表示明确知道_parentVnode不为null或undefined，否则会报错
   const parentVnode = (vm.$vnode = options._parentVnode!) // the placeholder node in parent tree
   const renderContext = parentVnode && (parentVnode.context as Component)
   vm.$slots = resolveSlots(options._renderChildren, renderContext)
@@ -128,6 +129,7 @@ export function renderMixin(Vue: typeof Component) {
       setCurrentInstance(vm)
       currentRenderingInstance = vm
       // 执行传进来的render函数会得到一个vnode
+      // 初始化时vm._renderProxy = vm
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e: any) {
       handleError(e, vm, `render`)

@@ -18,6 +18,7 @@ function Vue(options) {
 }
 
 // 在vue原型上定义了很多方法
+// 定义了_init方法，用于初始化vue实例
 //@ts-expect-error Vue has function type
 initMixin(Vue)
 //@ts-expect-error Vue has function type
@@ -26,6 +27,7 @@ stateMixin(Vue)
 eventsMixin(Vue)
 //@ts-expect-error Vue has function type
 lifecycleMixin(Vue)
+// 定义了_render方法，用于生成虚拟dom,_init方法中会调用
 //@ts-expect-error Vue has function type
 renderMixin(Vue)
 

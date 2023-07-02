@@ -30,7 +30,7 @@ export const isSVG = makeMap(
 )
 
 export const isPreTag = (tag?: string): boolean => tag === 'pre'
-
+// 是否为原始标签
 export const isReservedTag = (tag: string): boolean | undefined => {
   return isHTMLTag(tag) || isSVG(tag)
 }

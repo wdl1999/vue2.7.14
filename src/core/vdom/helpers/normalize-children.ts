@@ -20,10 +20,13 @@ import {
 // normalization is needed - if any child is an Array, we flatten the whole
 // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
 // because functional components already normalize their own children.
-// 扁平化但只扁平化第一层
+// 二维数组降成一维数组
+// 应用场景：函数式组件
 export function simpleNormalizeChildren(children: any) {
   for (let i = 0; i < children.length; i++) {
     if (isArray(children[i])) {
+      // [].concat(1,2,[3,4]) === [1,2,3,4]
+      // for循环return会终止循环
       return Array.prototype.concat.apply([], children)
     }
   }
@@ -50,17 +53,18 @@ function isTextNode(node): boolean {
 // 递归调用实现树结构扁平化
 function normalizeArrayChildren(
   children: any,
-  nestedIndex?: string  // 记录嵌套
+  nestedIndex?: string // 记录嵌套
 ): Array<VNode> {
   const res: VNode[] = [] // 存放扁平化的结果
   let i, c, lastIndex, last
   for (i = 0; i < children.length; i++) {
     c = children[i]
+    // continue: 继续下一次循环
     if (isUndef(c) || typeof c === 'boolean') continue
     lastIndex = res.length - 1
     last = res[lastIndex]
-    // 如果c是嵌套的数组，递归调用自身得到子子树的深度遍历结果
-    // 画个树自己走一遍就理解了
+    // 如果c是嵌套的数组: 递归调用自身得到子子树的深度遍历结果
+    // 应用场景：v-for、template、slot
     if (isArray(c)) {
       if (c.length > 0) {
         c = normalizeArrayChildren(c, `${nestedIndex || ''}_${i}`)
@@ -71,10 +75,9 @@ function normalizeArrayChildren(
         }
         res.push.apply(res, c)
       }
-    } 
-    // 如果c为基础类型，则转换为VNode
+    }
+    // 如果c为基础类型: 则转换为VNode
     else if (isPrimitive(c)) {
-      
       if (isTextNode(last)) {
         // merge adjacent text nodes
         // this is necessary for SSR hydration because text nodes are
@@ -84,8 +87,8 @@ function normalizeArrayChildren(
         // convert primitive to vnode
         res.push(createTextVNode(c))
       }
-    } 
-    // 如果c本身就是VNode，则直接push，并记录嵌套结果到key属性
+    }
+    // 如果c本身就是VNode: 则直接push，并记录嵌套结果到key属性
     else {
       if (isTextNode(c) && isTextNode(last)) {
         // merge adjacent text nodes

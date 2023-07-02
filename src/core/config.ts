@@ -126,3 +126,4 @@ export default {
    */
   _lifecycleHooks: LIFECYCLE_HOOKS
 } as unknown as Config
+// as unknown as xxx 强制转换成Config类型
