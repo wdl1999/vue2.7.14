@@ -63,12 +63,20 @@ function createKeyToOldIdx(children, beginIdx, endIdx) {
   return map
 }
 
+/**
+ * 工厂函数，注入平台特有的一些功能操作，并定义一些方法，然后返回 patch 函数
+ */
 export function createPatchFunction(backend) {
   let i, j
   const cbs: any = {}
 
   const { modules, nodeOps } = backend
-
+  /**
+   * hooks = ['create', 'activate', 'update', 'remove', 'destroy']
+   * 遍历这些钩子，然后从 modules 的各个模块中找到相应的方法，比如：directives 中的 create、update、destroy 方法
+   * 让这些方法放到 cb[hook] = [hook 方法] 中，比如: cb.create = [fn1, fn2, ...]
+   * 然后在合适的时间调用相应的钩子方法完成对应的操作
+   */
   for (i = 0; i < hooks.length; ++i) {
     cbs[hooks[i]] = []
     for (j = 0; j < modules.length; ++j) {
@@ -117,7 +125,7 @@ export function createPatchFunction(backend) {
   }
 
   let creatingElmInVPre = 0
-
+  // 创建元素节点
   function createElm(
     vnode,
     insertedVnodeQueue,
@@ -347,7 +355,7 @@ export function createPatchFunction(backend) {
       )
     }
   }
-
+  // 从父节点中移除子节点
   function invokeDestroyHook(vnode) {
     let i, j
     const data = vnode.data
@@ -355,6 +363,7 @@ export function createPatchFunction(backend) {
       if (isDef((i = data.hook)) && isDef((i = i.destroy))) i(vnode)
       for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode)
     }
+    // 如果有子节点，递归调用销毁钩子
     if (isDef((i = vnode.children))) {
       for (j = 0; j < vnode.children.length; ++j) {
         invokeDestroyHook(vnode.children[j])
@@ -797,22 +806,30 @@ export function createPatchFunction(backend) {
       return node.nodeType === (vnode.isComment ? 8 : 3)
     }
   }
+  /**
+   * vm.__patch__
+   *   1、新节点不存在，老节点存在，调用 destroy，销毁老节点
+   *   2、如果 oldVnode 是真实元素，则表示首次渲染，创建新节点，并插入 body，然后移除老节点
+   *   3、如果 oldVnode 不是真实元素，则表示更新阶段，执行 patchVnode
+   */
 
   return function patch(oldVnode, vnode, hydrating, removeOnly) {
+    // 如果新节点不存在，老节点存在，则调用 destroy，销毁老节点
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
       return
     }
 
     let isInitialPatch = false
-    const insertedVnodeQueue: any[] = []
+    const insertedVnodeQueue: any[] = [] // 存储插入的 VNode
 
+    // 新的 VNode 存在，老的 VNode 不存在，这种情况会在一个组件初次渲染的时候出现
     if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
-      const isRealElement = isDef(oldVnode.nodeType)
+      const isRealElement = isDef(oldVnode.nodeType) // 是否是真实元素，真实元素存在 nodeType 属性表示dom元素类型
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
         patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)

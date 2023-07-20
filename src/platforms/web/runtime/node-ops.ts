@@ -7,6 +7,7 @@ export function createElement(tagName: string, vnode: VNode): Element {
     return elm
   }
   // false or null will remove the attribute but undefined will not
+  // html原生组件<select>
   if (
     vnode.data &&
     vnode.data.attrs &&
@@ -17,18 +18,22 @@ export function createElement(tagName: string, vnode: VNode): Element {
   return elm
 }
 
+// 创建命名空间元素节点, 并插入HTML文档中
 export function createElementNS(namespace: string, tagName: string): Element {
   return document.createElementNS(namespaceMap[namespace], tagName)
 }
 
+// 创建文本节点, 并插入HTML文档中
 export function createTextNode(text: string): Text {
   return document.createTextNode(text)
 }
 
+// 创建注释节点, 并插入HTML文档中
 export function createComment(text: string): Comment {
   return document.createComment(text)
 }
 
+// 将新节点插入到参考节点referenceNode之前
 export function insertBefore(
   parentNode: Node,
   newNode: Node,
